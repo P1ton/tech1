@@ -1,0 +1,124 @@
+---
+- hosts: "all"
+  become: true
+  tasks:
+  - name: "Установка curl"
+    ansible.builtin.apt:
+      name: "curl"
+      state: "latest"
+      update_cache: true
+  - name: "Обновление пакетов"
+    ansible.builtin.apt:
+      upgrade: yes
+      update_cache: yes
+  - name: "Создание Webdeveloper"
+    ansible.builtin.user:
+     name: Webdeveloper
+     password: S52we9V6QTp7| password_hash('sha512')
+  - name: "Создание Devopsengineer"
+    ansible.builtin.user:
+     name: Devopsengineer
+     password: dHy6sKGHsj2T | password_hash('sha512')
+  - name: "Создание Projectmanager"
+    ansible.builtin.user:
+     name: Projectmanager
+     password: oP92ugMSaCbe| password_hash('sha512')
+  - name: "Создание ssh directory Webdeveloper"
+    ansible.builtin.file:
+      path: /Webdeveloper/.ssh/
+      state: directory
+  - name: "Создание ssh directory Devopsengineer"
+    ansible.builtin.file:
+      path: /Devopsengineer/.ssh/
+      state: directory
+  - name: "Создание ssh directory Projectmanager"
+    ansible.builtin.file:
+      path: /Projectmanager/.ssh/
+      state: directory
+  - name: "Размещение ключа"
+    ansible.builtin.copy:
+      src: /etc/ansible/ssh-rsa
+      dest: /Webdeveloper/.ssh/
+  - name: "Размещение ключа"
+    ansible.builtin.copy:
+      src: /etc/ansible/ssh-rsa
+      dest: /Devopsengineer/.ssh/
+  - name: "Размещение ключа"
+    ansible.builtin.copy:
+     src: /etc/ansible/ssh-rsa
+     dest: /Projectmanager/.ssh/
+  - name: "Порт 80 ufw"
+    ansible.builtin.ufw:
+      rule: allow
+      proto: tcp
+      port: 80
+  - name: "Порт 8080 ufw"
+    ansible.builtin.ufw:
+      rule: allow
+      proto: tcp
+      port: 8080
+  - name: "Порт 1834 ufw"
+    ansible.builtin.ufw:
+      rule: allow
+      proto: tcp
+      port: 1834
+  - name: "Рестарт ufw"
+    service:
+      name: ufw
+      state: restarted
+  - name: "Запуск ufw"
+    ansible.builtin.ufw:
+      state: enabled
+  - name: "Установка порта 1834"
+    lineinfile:
+     dest: "/etc/ssh/sshd_config"
+     regexp: "^Port"
+     line: "Port 1834"
+  - name: "Разрешение авторизации по публичным ключам"
+    lineinfile:
+     dest: "/etc/ssh/sshd_config"
+     regexp: "^PubkeyAuthentication no"
+     line: "PubkeyAuthentication yes"
+  - name: "Создание директории /skillcloud-nginx"
+    ansible.builtin.file:
+     path: /skillcloud-nginx
+     state: directory
+  - name: "Копирование файлов в /skillcloud-nginx"
+    ansible.builtin.copy:
+     src: /wsr-skillcloud/Dockerfile-balance
+     dest: /skillcloud-nginx
+  - name: "Копирование файлов в /skillcloud-nginx"
+    ansible.builtin.copy:
+     src: /wsr-skillcloud/docker-compose.yml
+     dest: /skillcloud-nginx
+  - name: "Копирование файлов в /skillcloud-nginx"
+    ansible.builtin.copy:
+     src: /wsr-skillcloud/docker-compose.yml
+     dest: /skillcloud-nginx
+  - name: "Копирование файлов в /skillcloud-nginx"
+    ansible.builtin.copy:
+     src: /wsr-skillcloud/docker-compose.sh
+     dest: /skillcloud-nginx
+  - name: "Копирование файлов в /skillcloud-nginx"
+    ansible.builtin.copy:
+     src: /wsr-skillcloud/Dockerfile-site
+     dest: /skillcloud-nginx
+  - name: "Копирование файлов в /skillcloud-nginx"
+    ansible.builtin.copy:
+     src: /wsr-skillcloud/nginx.conf
+     dest: /skillcloud-nginx
+  - name: "Копирование файлов в /skillcloud-nginx"
+    ansible.builtin.copy:
+     src: /wsr-skillcloud/index.html
+     dest: /skillcloud-nginx
+  - name: reboot
+    reboot:
+  - name: "Перезагрузка ufw"
+    ufw:
+     state: reloaded
+  - name: "Перезагрузка sshd"
+    service:
+      name: ssh
+      state: restarted
+
+...
